@@ -4,6 +4,7 @@ Python module to parse FastQC output data.
 from __future__ import print_function
 
 import zipfile
+import re
 
 
 class Fadapa(object):
@@ -13,18 +14,22 @@ class Fadapa(object):
 
     def __init__(self, file_name, **kwargs):
         """
-        :arg file_name: Name of fastqc_data text file.
+        :arg file_name: Name of fastqc_data text file, or of fastqc zipfile.
         :type file_name: str.
         """
 
         self._content = []
         self.file_name = file_name
+        fq_data_file_name = 'fastqc_data.txt'
         self._m_mark = '>>'
         self._m_end = '>>END_MODULE'
-        if file_name.endswith(".zip"):
-            with zipfile.ZipFile(file_name, 'r') as fqz:
-                self._content = \
-                        fqz.open("*/fastqc_data.txt", 'r').read().splitlines()
+        if  zipfile.is_zipfile(file_name):
+            with zipfile.ZipFile(file_name, mode='r') as fqz:
+                # print('zipfile namelist: {}'.format(str(fqz.namelist())))
+                for file in fqz.namelist():
+                    if re.search(fq_data_file_name, file):
+                        fq_data_file = file
+                self._content = fqz.open(fq_data_file, 'r').read().splitlines()
         else:
             self._content = open(file_name, **kwargs).read().splitlines()
 
