@@ -24,7 +24,7 @@ class Fadapa(object):
         if file_name.endswith(".zip"):
             with zipfile.ZipFile(file_name, 'r') as fqz:
                 self._content = \
-                        fqz.open("fastqc_data.txt", 'r').read().splitlines()
+                        fqz.open("*/fastqc_data.txt", 'r').read().splitlines()
         else:
             self._content = open(file_name, **kwargs).read().splitlines()
 
@@ -44,7 +44,7 @@ class Fadapa(object):
 
         """
         modules = [line.split('\t') for line in self._content
-                if self._m_mark in line and self._m_end not in line]
+                   if self._m_mark in line and self._m_end not in line]
         data = [[i[2:], j] for i, j in modules]
         data.insert(0, ['Module Name', 'Status'])
         return data
@@ -67,7 +67,7 @@ class Fadapa(object):
         :return: List of strings which consists of raw data of module.
         """
         s_pos = next(self._content.index(x) for x in self._content
-                if module in x)
+                     if module in x)
         e_pos = self._content[s_pos:].index(self._m_end)
         raw_data = self._content[s_pos:s_pos+e_pos+1]
         return raw_data
