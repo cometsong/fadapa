@@ -20,12 +20,13 @@ class Fadapa(object):
 
         self._content = []
         self.file_name = file_name
+        self._modules = self.modules()
+        self.basic_stats = self.basic_stats()
         fq_data_file_name = 'fastqc_data.txt'
         self._m_mark = '>>'
         self._m_end = '>>END_MODULE'
         if  zipfile.is_zipfile(file_name):
             with zipfile.ZipFile(file_name, mode='r') as fqz:
-                # print('zipfile namelist: {}'.format(str(fqz.namelist())))
                 for file in fqz.namelist():
                     if re.search(fq_data_file_name, file):
                         fq_data_file = file
@@ -89,3 +90,15 @@ class Fadapa(object):
                 for x in self.raw_data(module)[1:-1]]
         data[0][0] = data[0][0][1:]
         return data
+
+    def basic_stats(self):
+        """return dict of items in basic Statistics"""
+        return {stat: value for stat, value in
+                self.clean_data('Basic Statistics')[1:]
+               }
+
+    def modules(self):
+        """parse module names from super.summary()"""
+        module_names = [module[0] for module in self.summary()[1:]]
+        return module_names
+
